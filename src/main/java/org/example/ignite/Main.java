@@ -22,7 +22,7 @@ public class Main {
         System.out.println(container.getDateTime());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm");
         LocalDateTime dateTime = LocalDateTime.parse(container.getDateTime(), formatter);
-        int key = dateTime.getHour();
+        String key = dateTime.getDayOfMonth() + "-" + dateTime.getHour();
         // Preparing IgniteConfiguration using Java APIs
         IgniteConfiguration cfg = new IgniteConfiguration();
 
@@ -40,10 +40,10 @@ public class Main {
         // Starting the node
         Ignite ignite = Ignition.start(cfg);
 
-        CacheConfiguration<Integer, String> cacheCfg = new CacheConfiguration<>();
+        CacheConfiguration<String, String> cacheCfg = new CacheConfiguration<>();
         cacheCfg.setName("ContainerCache");
-        cacheCfg.setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.ONE_HOUR));
-        IgniteCache<Integer, String> cache = ignite.getOrCreateCache(cacheCfg);
+        cacheCfg.setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.ONE_DAY));
+        IgniteCache<String, String> cache = ignite.getOrCreateCache(cacheCfg);
         cache.putIfAbsent(key, container.toString());
 
         System.out.println(">> Created the cache and add the values.");
